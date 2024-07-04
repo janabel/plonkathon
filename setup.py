@@ -66,6 +66,12 @@ class Setup(object):
     def commit(self, values: Polynomial) -> G1Point:
         assert values.basis == Basis.LAGRANGE
 
+        # KZG commitment = g^(f(tau)), where tau is unknown universal randomness from trusted setup
+        # right now expressed as lagrange basis = evaluations on roots of unity. want to recover monomial coefficients to evaluate on tau
+        monomial_poly = values.fft(inv=True)
+        out = 0
+        for i in range(len(values.values)):
+            out += monomial_poly.values[i] * Setup.powers_of_x[i]
         # Run inverse FFT to convert values from Lagrange basis to monomial basis
         # Optional: Check values size does not exceed maximum power setup can handle
         # Compute linear combination of setup with values
