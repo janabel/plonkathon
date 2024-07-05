@@ -76,5 +76,41 @@ class Setup(object):
     # Generate the verification key for this program with the given setup
     def verification_key(self, pk: CommonPreprocessedInput) -> VerificationKey:
         # Create the appropriate VerificationKey object
-        # vp = ([s], [w]) needs commitment to the selector polynomial and the permutation polynomial
-        return NotImplemented
+        # vp = ([Q], [S]) needs commitment to the selector polynomials (Q) and the permutation polynomials (S)
+        vk = VerificationKey
+
+        vk.Qm = self.commit(pk.QM)
+        vk.Ql = self.commit(pk.QL)
+        vk.Qr = self.commit(pk.QR)
+        vk.Qo = self.commit(pk.QO)
+        vk.Qc = self.commit(pk.QC)
+        vk.S1 = self.commit(pk.S1)
+        vk.S2 = self.commit(pk.S2)
+        vk.S3 = self.commit(pk.S3)
+        vk.X_2 = self.X2
+        vk.w = Scalar.root_of_unity(pk.group_order) # root of unity
+        
+        return vk
+    
+    # # we set this to some power of 2 (so that we can FFT over it), that is at least the number of constraints we have (so we can Lagrange interpolate them)
+    # group_order: int
+    # # [q_M(x)]₁ (commitment to multiplication selector polynomial)
+    # Qm: G1Point
+    # # [q_L(x)]₁ (commitment to left selector polynomial)
+    # Ql: G1Point
+    # # [q_R(x)]₁ (commitment to right selector polynomial)
+    # Qr: G1Point
+    # # [q_O(x)]₁ (commitment to output selector polynomial)
+    # Qo: G1Point
+    # # [q_C(x)]₁ (commitment to constants selector polynomial)
+    # Qc: G1Point
+    # # [S_σ1(x)]₁ (commitment to the first permutation polynomial S_σ1(X))
+    # S1: G1Point
+    # # [S_σ2(x)]₁ (commitment to the second permutation polynomial S_σ2(X))
+    # S2: G1Point
+    # # [S_σ3(x)]₁ (commitment to the third permutation polynomial S_σ3(X))
+    # S3: G1Point
+    # # [x]₂ = xH, where H is a generator of G_2
+    # X_2: G2Point
+    # # nth root of unity (i.e. ω^1), where n is the program's group order.
+    # w: Scalar
