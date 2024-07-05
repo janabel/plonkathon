@@ -66,9 +66,15 @@ class Setup(object):
     def commit(self, values: Polynomial) -> G1Point:
         assert values.basis == Basis.LAGRANGE
 
-        return NotImplemented
+        poly = values.fft(inv=True)
+        d = len(poly.values)
+        # ec_lincomb(pairs) where pairs = list of (pt, coeff), gives you linear combination on elliptic curve 
+        pairs = [(self.powers_of_x[i], poly.values[i]) for i in range(d)]
+        return ec_lincomb(pairs)
+        
 
     # Generate the verification key for this program with the given setup
     def verification_key(self, pk: CommonPreprocessedInput) -> VerificationKey:
         # Create the appropriate VerificationKey object
+        # vp = ([s], [w]) needs commitment to the selector polynomial and the permutation polynomial
         return NotImplemented

@@ -1,0 +1,4 @@
+[console_scripts]
+conductor=maestrowf.conductor:main
+maestro=maestrowf.maestro:main
+

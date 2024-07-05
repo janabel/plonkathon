@@ -1,0 +1,194 @@
+{
+  "DESCRIPTION": {
+    "type": "object",
+    "properties": {
+      "name": {"type": "string", "minLength": 1},
+      "description": {"type": "string", "minLength": 1}
+    },
+    "required": [
+      "name",
+      "description"
+    ]
+  },
+  "PARAM": {
+    "type": "object",
+    "properties": {
+      "values": {
+        "type": "array"
+      },
+      "label": {"type": "string", "minLength": 1}
+    },
+    "additionalProperties": false,
+    "required": [
+      "values",
+      "label"
+    ]
+  },
+  "STUDY_STEP": {
+    "type": "object",
+    "properties": {
+      "name": {"type": "string", "minLength": 1},
+      "description": {"type": "string", "minLength": 1},
+      "run": {
+        "type": "object",
+        "properties": {
+          "cmd": {"type": "string", "minLength": 1},
+          "depends": {"type": "array", "uniqueItems": true},
+          "pre": {"type": "string", "minLength": 1},
+          "post": {"type": "string", "minLength": 1},
+          "restart": {"type": "string", "minLength": 1},
+          "nodes": {
+            "anyOf": [
+              {"type": "integer", "minimum": 1},
+              {"type": "string", "pattern": "^\\$\\(\\w+\\)$"}
+            ]
+          },
+          "procs": {
+            "anyOf": [
+              {"type": "integer", "minimum": 1},
+              {"type": "string", "pattern": "^\\$\\(\\w+\\)$"}
+            ]},
+          "gpus": {
+            "anyOf": [
+              {"type": "integer", "minimum": 0},
+              {"type": "string", "pattern": "^\\$\\(\\w+\\)$"}
+            ]},
+          "cores per task": {
+            "anyOf": [
+              {"type": "integer", "minimum": 1},
+              {"type": "string", "pattern": "^\\$\\(\\w+\\)$"}
+            ]},
+          "tasks per rs": {
+            "anyOf": [
+              {"type": "integer", "minimum": 1},
+              {"type": "string", "pattern": "^\\$\\(\\w+\\)$"}
+            ]},
+          "rs per node": {
+            "anyOf": [
+              {"type": "integer", "minimum": 1},
+              {"type": "string", "pattern": "^\\$\\(\\w+\\)$"}
+            ]},
+          "cpus per rs": {
+            "anyOf": [
+              {"type": "integer", "minimum": 1},
+              {"type": "string", "pattern": "^\\$\\(\\w+\\)$"}
+            ]},            
+          "bind": {
+            "anyOf": [
+              {"type": "string", "minLength": 1},
+              {"type": "string", "pattern": "^\\$\\(\\w+\\)$"}
+            ]},
+          "bind gpus": {
+            "anyOf": [
+              {"type": "string", "minLength": 1},
+              {"type": "string", "pattern": "^\\$\\(\\w+\\)$"}
+            ]},            
+          "walltime": {
+            "anyOf": [
+              {"type": "string", "minLength": 1},
+              {"type": "integer", "minimum": 0},
+              {"type": "string", "pattern": "^\\$\\(\\w+\\)$"}
+            ]},
+          "reservation": {"type": "string", "minLength": 1},
+          "exclusive": {
+            "anyOf": [
+              {"type": "boolean"},
+              {"type": "string", "pattern": "^\\$\\(\\w+\\)$"}
+            ]},
+          "nested": {"type": "boolean"},
+          "waitable": {"type": "boolean"},  
+          "priority": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "HELD", "MINIMAL", "LOW", "MEDIUM", "HIGH", "EXPEDITED",
+                  "held", "minimal", "low", "medium", "high", "expedited",
+                  "Held", "Minimal", "Low", "Medium", "High", "Expedited"
+                ]
+              },
+              {"type": "number", "minimum": 0.0, "maximum": 1.0}
+            ]
+          },
+          "qos": {"type": "string", "minLength": 1}
+        },
+        "additionalProperties": false,
+        "required": [
+          "cmd"
+        ]
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "name",
+      "description",
+      "run"
+    ]
+  },
+  "ENV": {
+    "type": "object",
+    "properties": {
+      "variables": {
+        "type": "object",
+        "patternProperties": {
+          "^.*": {
+            "anyOf": [
+                {"type": "string", "minLength": 1},
+                {"type": "number"}
+            ]
+          }
+        }
+      },
+      "labels": {"type": "object"},
+      "sources": {"type": "array"},
+      "dependencies": {
+        "type": "object",
+        "properties": {
+          "paths": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {"type": "string", "minLength": 1},
+                "path": {"type": "string", "minLength": 1}
+              },
+              "required": [
+                "name",
+                "path"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "git": {
+            "type": "array",
+            "items": {
+              "properties": {
+                "name": {"type": "string", "minLength": 1},
+                "path": {"type": "string", "minLength": 1},
+                "url": {"type": "string", "minLength": 1},
+                "tag": {"type": "string", "minLength": 1}
+              },
+              "required": [
+                "name",
+                "path",
+                "url"
+              ]
+            }
+          },
+          "spack": {
+            "type": "object",
+            "properties": {
+              "name": {"type": "string", "minLength": 1},
+              "package_name": {"type": "string", "minLength": 1}
+            },
+            "required": [
+              "type",
+              "package_name"
+            ]
+          }
+        }
+      }
+    },
+    "additionalProperties": false
+  }
+}
