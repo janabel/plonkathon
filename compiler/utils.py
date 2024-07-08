@@ -5,8 +5,8 @@ from dataclasses import dataclass
 
 class Column(Enum):
     LEFT = 1
-    RIGHT = 2
-    OUTPUT = 3
+    RIGHT = 2 # k1
+    OUTPUT = 3 # k2
 
     def __lt__(self, other):
         if self.__class__ is other.__class__:

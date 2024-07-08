@@ -32,7 +32,8 @@ class CommonPreprocessedInput:
 
 class Program:
     constraints: list[AssemblyEqn]
-    group_order: int
+    group_order: int # n = order of the subgroup of F_q formed by nth roots of unity, where q is order of base field of elliptic curve (order of EC group)
+    # just need n to be larger than the number of constraints
 
     def __init__(self, constraints: list[str], group_order: int):
         if len(constraints) > group_order:
@@ -87,7 +88,7 @@ class Program:
         # For example, if some variable is used in positions
         # (LEFT, 4), (LEFT, 7) and (OUTPUT, 2), then we store:
         #
-        # at S[LEFT][7] the field element representing (LEFT, 4)
+        # at S[LEFT][7] the field element representing (LEFT, 4) (field element here is like w^i or w^i*k1 or w^i*k2)
         # at S[OUTPUT][2] the field element representing (LEFT, 7)
         # at S[LEFT][4] the field element representing (OUTPUT, 2)
 
