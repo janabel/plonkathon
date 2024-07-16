@@ -152,6 +152,8 @@ def verifier_test_unoptimized(setup, proof):
     program = Program(["e public", "c <== a * b", "e <== c * d"], 8)
     public = [60]
     vk = setup.verification_key(program.common_preprocessed_input())
+    # print(f'type(vk) = {type(vk)}')
+    # assert type(vk) == VerificationKey
     assert vk.verify_proof_unoptimized(8, proof, public)
     print("Verifier test success")
 
@@ -163,6 +165,8 @@ def verifier_test_full(setup, proof):
     program = Program(["e public", "c <== a * b", "e <== c * d"], 8)
     public = [60]
     vk = setup.verification_key(program.common_preprocessed_input())
+    # print(f'vk = {vk}')
+    # print(f'type(vk) = {type(vk)}')
     assert vk.verify_proof_unoptimized(8, proof, public)
     assert vk.verify_proof(8, proof, public)
     print("Verifier test success")
@@ -272,7 +276,7 @@ if __name__ == "__main__":
     with open("test/proof.pickle", "rb") as f:
         proof = pickle.load(f)
     verifier_test_unoptimized(setup, proof)
-    verifier_test_full(setup, proof)
+    verifier_test_full(setup, proof) # just gonna do full implementation
 
     # Step 4: Pass end-to-end tests for prover and verifier
     ab_plus_a_test(setup)
