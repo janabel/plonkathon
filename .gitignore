@@ -1,5 +1,6 @@
-venv
+.venv
 *.pyc
 # Remove jupyter notebook stuff
 *.ipynb
 settings.json
+scrap.py
