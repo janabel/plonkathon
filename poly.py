@@ -143,8 +143,8 @@ class Polynomial:
     def to_coset_extended_lagrange(self, offset):
         assert self.basis == Basis.LAGRANGE
         group_order = len(self.values)
-        x_powers = self.ifft().values
-        x_powers = [(offset**i * x) for i, x in enumerate(x_powers)] + [Scalar(0)] * (
+        x_powers = self.ifft().values # a_0, a_1, ... coeffs of f(x)
+        x_powers = [(offset**i * x) for i, x in enumerate(x_powers)] + [Scalar(0)] * ( # offset**i * a_i, ... coeffs of f'(x) where f'(x)=f(offset*x)
             group_order * 3
         )
         return Polynomial(x_powers, Basis.MONOMIAL).fft()
@@ -153,18 +153,20 @@ class Polynomial:
     # Note that we can't make a full inverse function of to_coset_extended_lagrange
     # because the output of this might be a deg >= n polynomial, which cannot
     # be expressed via evaluations at n roots of unity
-    def coset_extended_lagrange_to_coeffs(self, offset):
+    def coset_extended_lagrange_to_coeffs(self, offset): # convert from evaluations of f(offset*x) on x=[q^0, q^1, ...] to coeffs representing poly f(x) 
         assert self.basis == Basis.LAGRANGE
 
-        shifted_coeffs = self.ifft().values
+        # a_0 x^0 + a_1 x^1 + ... 
+        # 
+        shifted_coeffs = self.ifft().values # evaluation at [offset, offset * q, offset * q**2 ... offset * q**(4n-1)] where q = w**(1/4)
         inv_offset = 1 / offset
         return Polynomial(
-            [v * inv_offset**i for (i, v) in enumerate(shifted_coeffs)],
-            Basis.LAGRANGE,
+            [v * inv_offset**i for (i, v) in enumerate(shifted_coeffs)], # back to coeffs that evaluate f(x) 
+            Basis.LAGRANGE, 
         )
 
     # Given a polynomial expressed as a list of evaluations at roots of unity,
-    # evaluate it at x directly, without using an FFT to covert to coeffs first
+    # evaluate it at x directly, without using an FFT to convert to coeffs first
     def barycentric_eval(self, x: Scalar):
         assert self.basis == Basis.LAGRANGE
 
