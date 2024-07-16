@@ -20,6 +20,27 @@ class Setup(object):
     # [x]₂ = xH, where H is a generator of G_2
     X2: G2Point
 
+    ###### test verifier with known secret x = zeta = 20000 for debugging purposes #######
+    # @classmethod
+    # def from_file(cls, filename):
+    #     contents = open(filename, "rb").read()
+    #     powers = 2 ** contents[SETUP_FILE_POWERS_POS]
+
+    #     x = int(20000)
+    #     G1 = b.G1
+
+    #     powers_of_x = [ec_lincomb([(G1, x**i)]) for i in range(powers)]
+    #     # print(f'powers of x = {powers_of_x}')
+
+    #     G2 = b.G2
+    #     print(f'G2 = {G2}')
+    #     X2 = ec_lincomb([(G2, x)])
+    #     print(f'X2 = {X2}')
+
+    #     return cls(powers_of_x, X2)
+    
+    ########################################################
+
     @classmethod
     def from_file(cls, filename):
         contents = open(filename, "rb").read()
@@ -50,7 +71,7 @@ class Setup(object):
                 break
             pos += 1
         print("Detected start of G2 side at byte {}".format(pos))
-        X2_encoding = contents[pos + 32 * 4 : pos + 32 * 8]
+        X2_encoding = contents[pos + 32 * 4 : pos + 32 * 8] # changing encoding from a 32*4 byte number into int
         X2_values = [
             b.FQ(int.from_bytes(X2_encoding[i : i + 32], "little")) / factor
             for i in range(0, 128, 32)
@@ -58,8 +79,23 @@ class Setup(object):
         X2 = (b.FQ2(X2_values[:2]), b.FQ2(X2_values[2:]))
         assert b.is_on_curve(X2, b.b2)
         print("Extracted G2 side, X^1 point: {}".format(X2))
+
+
+        ########################################################
+
         # assert b.pairing(b.G2, powers_of_x[1]) == b.pairing(X2, b.G1)
         # print("X^1 points checked consistent")
+        # print(f'========= JANABEL TESTS =========')
+        # print(f'b.G1 = {b.G1}')
+        # print(f'b.G2 = {b.G2}')
+
+        # print(f'type(b.G1[0].coeffs) = {type(b.G2[0].coeffs)}')
+        # print(f'type(b.G1[0]) = {type(b.G2[0])}')
+        # print(f'type(b.G2[0].coeffs) = {type(b.G2[0].coeffs)}')
+        # print(f'type(b.G2[0]) = {type(b.G2[0])}')
+
+        # print(f'powers_of_x[0] = {powers_of_x[0]}') # shud be equal to b.G1
+
         return cls(powers_of_x, X2)
 
     # Encodes the KZG commitment that evaluates to the given values in the group
@@ -70,13 +106,16 @@ class Setup(object):
         d = len(poly.values)
         # ec_lincomb(pairs) where pairs = list of (pt, coeff), gives you linear combination on elliptic curve 
         pairs = [(self.powers_of_x[i], poly.values[i]) for i in range(d)]
-        return ec_lincomb(pairs)
+        return G1Point(ec_lincomb(pairs))
         
 
     # Generate the verification key for this program with the given setup
     def verification_key(self, pk: CommonPreprocessedInput) -> VerificationKey:
         # Create the appropriate VerificationKey object
         # vp = ([Q], [S]) needs commitment to the selector polynomials (Q) and the permutation polynomials (S)
+        x_1 = self.powers_of_x[1]
+        print(f'x_1 = {x_1}')
+        
         vk = VerificationKey(
             group_order=pk.group_order,
             Qm = self.commit(pk.QM),
@@ -89,8 +128,13 @@ class Setup(object):
             S3 = self.commit(pk.S3),
             X_2 = self.X2,
             w = Scalar.root_of_unity(pk.group_order), # root of unity
+            x_1=self.powers_of_x[1],
         )
-        
+
+        # print(f'Qm = self.commit(pk.QM) = {vk.Qm}')
+        # print(f'pk.QM.barycentric_eval(20000) = {pk.QM.barycentric_eval(20000)}')
+        # print(f'g^(Qm^n) = {ec_lincomb([(b.G1, pk.QM.barycentric_eval(20000))])}')
+
         return vk
     
     # # we set this to some power of 2 (so that we can FFT over it), that is at least the number of constraints we have (so we can Lagrange interpolate them)
