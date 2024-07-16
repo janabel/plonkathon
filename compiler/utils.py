@@ -4,6 +4,7 @@ from dataclasses import dataclass
 
 
 class Column(Enum):
+    # defining k1, k2 factors for columns (during permutation polynomial computations)
     LEFT = 1
     RIGHT = 2 # k1
     OUTPUT = 3 # k2
